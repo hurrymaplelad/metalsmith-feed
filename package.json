@@ -1,0 +1,30 @@
+{
+  "name": "metalsmith-feed",
+  "version": "0.0.0",
+  "description": "A metalsmith plugin to generate an RSS feed for a collection",
+  "author": "Adam Hull <adam@hmlad.com>",
+  "main": "lib/metalsmith_feed",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/hurrymaplelad/metalsmith-feed.git"
+  },
+  "homepage": "https://github.com/hurrymaplelad/metalsmith-feed",
+  "bugs": "https://github.com/hurrymaplelad/metalsmith-feed/issues",
+  "dependencies": {
+    "rss": "~1.0.0",
+    "extend": "~2.0.0"
+  },
+  "devDependencies": {
+    "coffee-script": ">=1.7.x",
+    "mocha": "~1.x.x",
+    "metalsmith": "~1.0.1",
+    "metalsmith-collections": "~0.6.0",
+    "xml2js": "~0.4.4"
+  },
+  "scripts": {
+    "pretest": "npm run compile",
+    "test": "mocha",
+    "compile": "coffee --bare --compile --output lib/ src/",
+    "prepublish": "npm run compile"
+  }
+}
