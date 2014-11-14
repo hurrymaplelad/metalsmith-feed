@@ -38,5 +38,5 @@ module.exports = (options={}) ->
         itemData.url = url.resolve siteUrl, file.path
       feed.item itemData
 
-    files[destination] = contents: feed.xml()
+    files[destination] = contents: new Buffer feed.xml(), 'utf8'
     done()
