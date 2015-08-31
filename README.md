@@ -3,7 +3,7 @@ metalsmith-feed [![NPM version](https://badge.fury.io/js/metalsmith-feed.png)](h
 
 A [metalsmith](https://github.com/segmentio/metalsmith) plugin to generate an RSS feed for a collection.
 
-Requires [metalsmith-collections](https://github.com/segmentio/metalsmith-collections).  Plays nicely with [permalinks](https://github.com/RobinThrift/metalsmith-paginate), [more](https://github.com/kfranqueiro/metalsmith-more), and [excerpts](https://github.com/segmentio/metalsmith-excerpts).
+Requires [metalsmith-collections](https://github.com/segmentio/metalsmith-collections).  Plays nicely with [permalinks](https://github.com/segmentio/metalsmith-permalinks), [more](https://github.com/kfranqueiro/metalsmith-more), and [excerpts](https://github.com/segmentio/metalsmith-excerpts).
 
 Usage
 -----
@@ -32,4 +32,4 @@ Options
 
 Remaining options are passed to the [rss](https://github.com/dylang/node-rss) module as `feedOptions`, along with `metadata.site`.
 
-If files have `path` metadata (perhaps from [permalinks](https://github.com/RobinThrift/metalsmith-paginate)) but not `url` metadata, we'll prefix `path` with `site_url` to generate links. Feed item descriptions default to `file.less` from metalsmith-more, `file.excerpt` from metalsmith-excerpt, and finally the full `file.contents`.
+If files have `path` metadata (perhaps from [permalinks](https://github.com/segmentio/metalsmith-permalinks)) but not `url` metadata, we'll prefix `path` with `site_url` to generate links. Feed item descriptions default to `file.less` from metalsmith-more, `file.excerpt` from metalsmith-excerpt, and finally the full `file.contents`.
