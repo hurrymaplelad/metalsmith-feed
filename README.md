@@ -23,12 +23,15 @@ Metalsmith('example')
 
 Options
 -------
+Take a look at the tests for [example usage](test/metalsmith_feed.test.coffee).
 
 - `collection` **string** *Required*. The name of the configured metalsmith-collection to feed.
 
 - `limit` **Number** *Optional*. Maximum number of documents to show in the feed. Defaults to `20`. Set to `false` to include all documents.
 
 - `destination` **string** *Optional*. File path to write the rendered XML feed. Defaults to `'rss.xml'`.
+
+- `postDescription` **function** *Optional*. Takes a file and returns a description string.  Defaults to `(file) -> file.less or file.excerpt or file.contents`
 
 Remaining options are passed to the [rss](https://github.com/dylang/node-rss) module as `feedOptions`, along with `metadata.site`.
 
