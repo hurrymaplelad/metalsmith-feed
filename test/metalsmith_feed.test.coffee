@@ -41,6 +41,33 @@ describe 'metalsmith-feed', ->
       assert.equal post.description[0], '<p>juice appeal</p>\n'
       done()
 
+  it 'uses a custom renderer', (done) ->
+    @site =
+      title: 'Geocities'
+      url: 'http://example.com'
+      author: 'Philodemus'
+
+    @metalsmith
+    .metadata {@site}
+    .use collections posts: '*.html'
+    .use feed
+      collection: 'posts'
+      postDescription: (file) ->
+        '<h1>' + file.title + '</h1>' + file.contents
+
+    @buildJson (rss) =>
+      assert.equal rss['$']['xmlns:atom'], 'http://www.w3.org/2005/Atom'
+
+      channel = rss['channel'][0]
+      assert.equal channel.title[0], @site.title
+      assert.equal channel.author[0], @site.author
+      assert.equal channel.item.length, 1
+
+      post = channel.item[0]
+      assert.equal post.title[0], 'Theory of Juice'
+      assert.equal post.description[0], '<h1>Theory of Juice</h1><p>juice appeal</p>\n'
+      done()
+
   it 'complains if metalsmith-colllections isnt setup', (done) ->
     @metalsmith
     .use feed collection: 'posts'

@@ -6,6 +6,8 @@ module.exports = (options={}) ->
   limit = options.limit or 20
   destination = options.destination or 'rss.xml'
   collectionName = options.collection
+  postDescription = options.postDescription or (file) ->
+    file.less or file.excerpt or file.contents
 
   unless collectionName
     throw new Error 'collection option is required'
@@ -33,7 +35,7 @@ module.exports = (options={}) ->
       collection = collection[...limit]
     for file in collection
       itemData = extend {}, file,
-        description: file.less or file.excerpt or file.contents
+        description: postDescription(file)
       if not itemData.url and itemData.path
         itemData.url = url.resolve siteUrl, file.path
       feed.item itemData
