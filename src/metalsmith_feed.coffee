@@ -8,6 +8,7 @@ module.exports = (options={}) ->
   collectionName = options.collection
   postDescription = options.postDescription or (file) ->
     file.less or file.excerpt or file.contents
+  postCustomElements = options.postCustomElements
 
   unless collectionName
     throw new Error 'collection option is required'
@@ -36,6 +37,8 @@ module.exports = (options={}) ->
     for file in collection
       itemData = extend {}, file,
         description: postDescription(file)
+      if postCustomElements
+        itemData.custom_elements = postCustomElements(file)
       if not itemData.url and itemData.path
         itemData.url = url.resolve siteUrl, file.path
       feed.item itemData
