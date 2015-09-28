@@ -33,6 +33,8 @@ Take a look at the tests for [example usage](test/metalsmith_feed.test.coffee).
 
 - `postDescription` **function** *Optional*. Takes a file and returns a description string.  Defaults to `(file) -> file.less or file.excerpt or file.contents`
 
+- `postCustomElements` **function** *Optional*. From a file, return custom elements, like thumbnails, images, or information necessary to publish podcasts.
+
 Remaining options are passed to the [rss](https://github.com/dylang/node-rss) module as `feedOptions`, along with `metadata.site`.
 
 If files have `path` metadata (perhaps from [permalinks](https://github.com/segmentio/metalsmith-permalinks)) but not `url` metadata, we'll prefix `path` with `site_url` to generate links. Feed item descriptions default to `file.less` from metalsmith-more, `file.excerpt` from metalsmith-excerpt, and finally the full `file.contents`.
