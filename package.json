@@ -1,6 +1,6 @@
 {
   "name": "metalsmith-feed",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A metalsmith plugin to generate an RSS feed for a collection",
   "author": "Adam Hull <adam@hmlad.com>",
   "keywords": [
