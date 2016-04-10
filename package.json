@@ -19,15 +19,15 @@
   "bugs": "https://github.com/hurrymaplelad/metalsmith-feed/issues",
   "license": "MIT",
   "dependencies": {
-    "rss": "~1.1.0",
-    "extend": "~2.0.0"
+    "extend": "~3.0.0",
+    "rss": "~1.2.1"
   },
   "devDependencies": {
     "coffee-script": ">=1.7.x",
-    "mocha": "~1.x.x",
-    "metalsmith": "~1.0.1",
-    "metalsmith-collections": "~0.6.0",
-    "xml2js": "~0.4.4"
+    "metalsmith": "~2.1.0",
+    "metalsmith-collections": "~0.7.0",
+    "mocha": "~2.4.5",
+    "xml2js": "~0.4.16"
   },
   "scripts": {
     "pretest": "npm run compile",
