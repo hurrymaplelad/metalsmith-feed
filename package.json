@@ -20,13 +20,16 @@
   "license": "MIT",
   "dependencies": {
     "extend": "~3.0.0",
-    "rss": "~1.2.1"
+    "metalsmith": "~2.3.0",
+    "metalsmith-collections": "~0.9.0",
+    "rss": "~1.2.1",
+    "xml2js": "~0.4.17"
   },
   "devDependencies": {
-    "coffee-script": ">=1.7.x",
+    "coffee-script": "~1.12.2",
     "metalsmith": "~2.1.0",
     "metalsmith-collections": "~0.7.0",
-    "mocha": "~2.4.5",
+    "mocha": "~3.2.0",
     "xml2js": "~0.4.16"
   },
   "scripts": {

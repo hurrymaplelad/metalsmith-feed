@@ -120,5 +120,3 @@ describe 'metalsmith-feed', ->
         assert.ifError err
       , /site_url/
       done()
-
-
