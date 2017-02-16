@@ -41,6 +41,8 @@ module.exports = (options={}) ->
         itemData.custom_elements = postCustomElements(file)
       if not itemData.url and itemData.path
         itemData.url = url.resolve siteUrl, file.path
+      if options.preprocess
+        itemData = options.preprocess(itemData)
       feed.item itemData
 
     files[destination] = contents: new Buffer feed.xml(), 'utf8'
