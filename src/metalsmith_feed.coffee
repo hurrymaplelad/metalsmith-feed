@@ -25,6 +25,17 @@ module.exports = (options={}) ->
       site_url: metadata.site?.url
       generator: 'metalsmith-feed'
 
+    # Only pass whitelisted options to RSS constructor
+    feedOptionsFiltered = {}
+    whitelist = ['title', 'description', 'generator', 'feed_url', 'site_url',
+      'image_url', 'docs', 'managingEditor', 'webMaster', 'copyright',
+      'language', 'categories', 'pubDate', 'ttl', 'hub', 'custom_namespaces',
+      'custom_elements']
+    Object.keys(feedOptions).forEach (el) =>
+      feedOptionsFiltered[el] = feedOptions[el] if whitelist.indexOf(el) isnt -1
+
+    feedOptions = feedOptionsFiltered
+
     siteUrl = feedOptions.site_url
     unless siteUrl
       return done new Error 'either site_url or metadata.site.url must be configured'
