@@ -9,6 +9,7 @@ module.exports = (options={}) ->
   postDescription = options.postDescription or (file) ->
     file.less or file.excerpt or file.contents
   postCustomElements = options.postCustomElements
+  itemCallback = options.itemCallback
 
   unless collectionName
     throw new Error 'collection option is required'
@@ -41,6 +42,8 @@ module.exports = (options={}) ->
         itemData.custom_elements = postCustomElements(file)
       if not itemData.url and itemData.path
         itemData.url = url.resolve siteUrl, file.path
+      if itemCallback
+        itemCallback(file, itemData)
       feed.item itemData
 
     files[destination] = contents: new Buffer feed.xml(), 'utf8'

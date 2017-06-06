@@ -41,6 +41,29 @@ describe 'metalsmith-feed', ->
       assert.equal post.description[0], '<p>juice appeal</p>\n'
       done()
 
+  it 'invokes an itemCallback function if provided', (done) ->
+    @site =
+      title: 'Geocities'
+      url: 'http://example.com'
+      author: 'Philodemus'
+
+    @metalsmith
+    .metadata {@site}
+    .use collections posts: '*.html'
+    .use feed
+      collection: 'posts'
+      itemCallback: (file, itemData) -> itemData.categories = ['Foo', 'Bar']
+
+    @buildJson (rss) =>
+      assert.equal rss['$']['xmlns:atom'], 'http://www.w3.org/2005/Atom'
+
+      channel = rss['channel'][0]
+
+      post = channel.item[0]
+      assert.equal post.category[0], 'Foo'
+      assert.equal post.category[1], 'Bar'
+      done()
+
   it 'uses a custom renderer', (done) ->
     @site =
       title: 'Geocities'
@@ -120,5 +143,3 @@ describe 'metalsmith-feed', ->
         assert.ifError err
       , /site_url/
       done()
-
-
