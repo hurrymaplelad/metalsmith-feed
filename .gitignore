@@ -2,4 +2,5 @@ node_modules/
 npm-debug.log
 .DS_Store
 test/fixtures/complex/build/
+test/fixtures/many_posts/build/
 yarn.lock
