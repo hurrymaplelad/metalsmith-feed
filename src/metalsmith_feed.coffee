@@ -3,7 +3,7 @@ module.exports = (options={}) ->
   extend = require 'extend'
   url = require 'url'
 
-  limit = options.limit or 20
+  limit = options.limit ? 20
   destination = options.destination or 'rss.xml'
   collectionName = options.collection
   postDescription = options.postDescription or (file) ->
