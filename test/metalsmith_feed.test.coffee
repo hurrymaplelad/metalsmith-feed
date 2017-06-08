@@ -16,12 +16,12 @@ describe 'metalsmith-feed', ->
           assert.ifError err
           done result.rss
 
-  it 'renders an RSS feed', (done) ->
     @site =
       title: 'Geocities'
       url: 'http://example.com'
       author: 'Philodemus'
 
+  it 'renders an RSS feed', (done) ->
     @metalsmith
     .metadata {@site}
     .use collections posts: '*.html'
@@ -42,11 +42,6 @@ describe 'metalsmith-feed', ->
       done()
 
   it 'uses a custom renderer', (done) ->
-    @site =
-      title: 'Geocities'
-      url: 'http://example.com'
-      author: 'Philodemus'
-
     @metalsmith
     .metadata {@site}
     .use collections posts: '*.html'
@@ -69,13 +64,7 @@ describe 'metalsmith-feed', ->
       done()
 
   it 'adds custom elements to an item based on a function', (done) ->
-    @site =
-      title: 'Geocities'
-      url: 'http://example.com'
-      author: 'Philodemus'
-
     @metalsmith = Metalsmith('test/fixtures/complex')
-    @metalsmith
     .metadata {@site}
     .use collections posts: '*.html'
     .use feed
@@ -111,7 +100,7 @@ describe 'metalsmith-feed', ->
       , /collections/
       done()
 
-  it 'complains without a site_url', ->
+  it 'complains without a site_url', (done) ->
     @metalsmith
     .use collections posts: '*.html'
     .use feed collection: 'posts'
@@ -121,4 +110,26 @@ describe 'metalsmith-feed', ->
       , /site_url/
       done()
 
+  describe 'limit option', ->
+    beforeEach ->
+      @metalsmith = Metalsmith('test/fixtures/many_posts')
+      .metadata {@site}
+      .use collections posts: '*.html'
 
+    it 'limits the number of documents included in the feed', (done) ->
+      @metalsmith.use feed
+        collection: 'posts'
+        limit: 10
+
+      @buildJson (rss) =>
+        assert.equal rss['channel'][0].item.length, 10
+        done()
+
+    it 'is unlimited when set to false', (done) ->
+      @metalsmith.use feed
+        collection: 'posts'
+        limit: false
+
+      @buildJson (rss) =>
+        assert.equal rss['channel'][0].item.length, 25
+        done()
