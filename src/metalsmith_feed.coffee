@@ -41,6 +41,9 @@ module.exports = (options={}) ->
         itemData.custom_elements = postCustomElements(file)
       if not itemData.url and itemData.path
         itemData.url = url.resolve siteUrl, file.path
+      if itemData.link
+        itemData.guid = itemData.url
+        itemData.url = itemData.link
       if options.preprocess
         itemData = options.preprocess(itemData)
       feed.item itemData
