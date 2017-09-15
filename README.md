@@ -35,6 +35,18 @@ Take a look at the tests for [example usage](test/metalsmith_feed.test.coffee).
 
 - `postCustomElements` **function** *Optional*. From a file, return custom elements, like thumbnails, images, or information necessary to publish podcasts.
 
+- `preprocess` **function** *Optional*. Modify collection entries before creating the feed. Example:
+
+  ``` coffee
+  Metalsmith('example')
+    .use feed
+      collection: 'posts'
+      preprocess: (itemData) ->
+        # Make all titles uppercase
+        itemData.title = itemData.title.toUpperCase()
+        itemData
+  ```
+
 Remaining options are passed to the [rss](https://github.com/dylang/node-rss) module as `feedOptions`, along with `metadata.site`.
 
 If files have `path` metadata (perhaps from [permalinks](https://github.com/segmentio/metalsmith-permalinks)) but not `url` metadata, we'll prefix `path` with `site_url` to generate links. Feed item descriptions default to `file.less` from metalsmith-more, `file.excerpt` from metalsmith-excerpt, and finally the full `file.contents`.

@@ -110,6 +110,21 @@ describe 'metalsmith-feed', ->
       , /site_url/
       done()
 
+  it 'preprocessor returns uppercase of title', (done) ->
+    @metalsmith
+    .metadata {@site}
+    .use collections posts: '*.html'
+    .use feed
+      collection: 'posts'
+      preprocess: (itemData) ->
+        itemData.title = itemData.title.toUpperCase()
+        itemData
+
+    @buildJson (rss) =>
+      post = rss['channel'][0].item[0]
+      assert.equal post.title[0], 'THEORY OF JUICE'
+      done()
+
   describe 'limit option', ->
     beforeEach ->
       @metalsmith = Metalsmith('test/fixtures/many_posts')
