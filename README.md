@@ -50,3 +50,5 @@ Take a look at the tests for [example usage](test/metalsmith_feed.test.coffee).
 Remaining options are passed to the [rss](https://github.com/dylang/node-rss) module as `feedOptions`, along with `metadata.site`.
 
 If files have `path` metadata (perhaps from [permalinks](https://github.com/segmentio/metalsmith-permalinks)) but not `url` metadata, we'll prefix `path` with `site_url` to generate links. Feed item descriptions default to `file.less` from metalsmith-more, `file.excerpt` from metalsmith-excerpt, and finally the full `file.contents`.
+
+If files have `link` metadata set with any URL, it will be used to set `<link>` of the feed item. The `<guid>` will still be default permalink.
