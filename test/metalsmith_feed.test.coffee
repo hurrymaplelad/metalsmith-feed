@@ -148,3 +148,35 @@ describe 'metalsmith-feed', ->
       @buildJson (rss) =>
         assert.equal rss['channel'][0].item.length, 25
         done()
+
+  describe 'item with external url', ->
+    beforeEach ->
+      @metalsmith = Metalsmith('test/fixtures/external_link')
+      .metadata {@site}
+      .use collections posts: '*.html'
+
+    it 'url should be link set in the post', (done) ->
+      @metalsmith.use feed
+        collection: 'posts'
+
+      @buildJson (rss) =>
+        channel = rss['channel'][0]
+
+        post = channel.item[1]
+        assert.equal post.title[0], 'Theory of Juice - External'
+        assert.equal post.link[0], 'https://theory.com/juice/'
+        assert.equal post.guid[0]._, 'http://example.com/postwithlink.html'
+        done()
+
+    it 'url should permalink', (done) ->
+      @metalsmith.use feed
+        collection: 'posts'
+
+      @buildJson (rss) =>
+        channel = rss['channel'][0]
+
+        post = channel.item[0]
+        assert.equal post.title[0], 'Theory of Juice'
+        assert.equal post.link[0], 'http://example.com/post.html'
+        assert.equal post.guid[0]._, 'http://example.com/post.html'
+        done()
