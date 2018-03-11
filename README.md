@@ -1,6 +1,8 @@
 # metalsmith-feed
 
-[![npm](https://img.shields.io/npm/v/npm.svg?style=flat-square)](https://www.npmjs.com/package/metalsmith-feed) [![Build Status](https://img.shields.io/travis/hurrymaplelad/metalsmith-feed.svg?style=flat-square)](https://travis-ci.org/hurrymaplelad/metalsmith-feed)
+[![npm](https://img.shields.io/npm/v/npm.svg?style=flat-square)](https://www.npmjs.com/package/metalsmith-feed)
+[![Build Status](https://img.shields.io/travis/hurrymaplelad/metalsmith-feed.svg?style=flat-square)](https://travis-ci.org/hurrymaplelad/metalsmith-feed)
+[![Code Style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
 A [metalsmith](https://github.com/segmentio/metalsmith) plugin to generate an RSS feed for a collection.
 
@@ -9,19 +11,19 @@ Requires [metalsmith-collections](https://github.com/segmentio/metalsmith-collec
 ## Usage
 
 ```js
-const collections = require("metalsmith-collections");
-const feed = require("metalsmith-feed");
+const collections = require('metalsmith-collections');
+const feed = require('metalsmith-feed');
 
-Metalsmith("example")
+Metalsmith('example')
   .metadata(
     (site: {
-      title: "Geocities",
-      url: "http://example.com",
-      author: "Philodemus"
+      title: 'Geocities',
+      url: 'http://example.com',
+      author: 'Philodemus'
     })
   )
-  .use(collections({ posts: "*.html" }))
-  .use(feed({ collection: "posts" }));
+  .use(collections({posts: '*.html'}))
+  .use(feed({collection: 'posts'}));
 ```
 
 ### Options
@@ -41,9 +43,9 @@ Take a look at the tests for [example usage](test/metalsmith_feed.test.coffee).
 * `preprocess` **function** _Optional_. Modify collection entries before creating the feed. Example:
 
   ```js
-  Metalsmith("example").use(
+  Metalsmith('example').use(
     feed({
-      collection: "posts",
+      collection: 'posts',
       preprocess: itemData => {
         // Make all titles uppercase
         itemData.title = itemData.title.toUpperCase();
@@ -64,23 +66,23 @@ If files have `link` metadata set with any URL, it will be used to set `<link>` 
 Have a few collections you'd like to export? Register this plugin once for each:
 
 ```js
-Metalsmith("example")
+Metalsmith('example')
   .use(
     collections({
-      foo: "foo/*.html",
-      bar: "bar/*.html"
+      foo: 'foo/*.html',
+      bar: 'bar/*.html'
     })
   )
   .use(
     feed({
-      collection: "foo",
-      destination: "foo-rss.xml"
+      collection: 'foo',
+      destination: 'foo-rss.xml'
     })
   )
   .use(
     feed({
-      collection: "bar",
-      destination: "bar-rss.xml"
+      collection: 'bar',
+      destination: 'bar-rss.xml'
     })
   );
 ```

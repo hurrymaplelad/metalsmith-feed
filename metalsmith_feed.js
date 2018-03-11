@@ -2,20 +2,20 @@ module.exports = function(options) {
   if (options == null) {
     options = {};
   }
-  const RSS = require("rss");
-  const extend = require("extend");
-  const url = require("url");
+  const RSS = require('rss');
+  const extend = require('extend');
+  const url = require('url');
 
   const limit = options.limit != null ? options.limit : 20;
-  const destination = options.destination || "rss.xml";
+  const destination = options.destination || 'rss.xml';
   const collectionName = options.collection;
   const postDescription =
     options.postDescription ||
     (file => file.less || file.excerpt || file.contents);
-  const { postCustomElements } = options;
+  const {postCustomElements} = options;
 
   if (!collectionName) {
-    throw new Error("collection option is required");
+    throw new Error('collection option is required');
   }
 
   return function(files, metalsmith, done) {
@@ -23,7 +23,7 @@ module.exports = function(options) {
 
     if (!metadata.collections) {
       return done(
-        new Error("no collections configured - see metalsmith-collections")
+        new Error('no collections configured - see metalsmith-collections')
       );
     }
 
@@ -31,13 +31,13 @@ module.exports = function(options) {
 
     const feedOptions = extend({}, metadata.site, options, {
       site_url: metadata.site != null ? metadata.site.url : undefined,
-      generator: "metalsmith-feed"
+      generator: 'metalsmith-feed'
     });
 
     const siteUrl = feedOptions.site_url;
     if (!siteUrl) {
       return done(
-        new Error("either site_url or metadata.site.url must be configured")
+        new Error('either site_url or metadata.site.url must be configured')
       );
     }
 
@@ -50,7 +50,7 @@ module.exports = function(options) {
       collection = collection.slice(0, limit);
     }
     for (let file of collection) {
-      let itemData = extend({}, file, { description: postDescription(file) });
+      let itemData = extend({}, file, {description: postDescription(file)});
       if (postCustomElements) {
         itemData.custom_elements = postCustomElements(file);
       }
@@ -67,7 +67,7 @@ module.exports = function(options) {
       feed.item(itemData);
     }
 
-    files[destination] = { contents: new Buffer(feed.xml(), "utf8") };
+    files[destination] = {contents: new Buffer(feed.xml(), 'utf8')};
     return done();
   };
 };

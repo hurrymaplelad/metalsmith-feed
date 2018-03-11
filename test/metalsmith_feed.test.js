@@ -1,9 +1,3 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-const fs = require('fs');
 const assert = require('assert');
 const {parseString} = require('xml2js');
 const feed = require('..');
@@ -24,20 +18,22 @@ describe('metalsmith-feed', function() {
       });
     };
 
-    return this.site = {
+    return (this.site = {
       title: 'Geocities',
       url: 'http://example.com',
       author: 'Philodemus'
-    };
+    });
   });
 
   it('renders an RSS feed', function(done) {
     this.metalsmith
-    .metadata({site: this.site})
-    .use(collections({posts: '*.html'}))
-    .use(feed({
-      collection: 'posts'})
-    );
+      .metadata({site: this.site})
+      .use(collections({posts: '*.html'}))
+      .use(
+        feed({
+          collection: 'posts'
+        })
+      );
 
     return this.buildJson(rss => {
       assert.equal(rss['$']['xmlns:atom'], 'http://www.w3.org/2005/Atom');
@@ -57,17 +53,24 @@ describe('metalsmith-feed', function() {
   it('renders multiple feeds', function(done) {
     this.metalsmith = Metalsmith('test/fixtures/many_posts')
       .metadata({site: this.site})
-      .use(collections({
-        posts1: 'post1*.html',
-        posts2: 'post2*.html'
-      })).use(feed({
-        collection: 'posts1',
-        destination: 'rss1.xml'
-      })).use(feed({
-        collection: 'posts2',
-        destination: 'rss2.xml'
-      })
-    );
+      .use(
+        collections({
+          posts1: 'post1*.html',
+          posts2: 'post2*.html'
+        })
+      )
+      .use(
+        feed({
+          collection: 'posts1',
+          destination: 'rss1.xml'
+        })
+      )
+      .use(
+        feed({
+          collection: 'posts2',
+          destination: 'rss2.xml'
+        })
+      );
 
     return this.metalsmith.build(function(err, files) {
       assert.ifError(err);
@@ -86,15 +89,16 @@ describe('metalsmith-feed', function() {
 
   it('uses a custom renderer', function(done) {
     this.metalsmith
-    .metadata({site: this.site})
-    .use(collections({posts: '*.html'}))
-    .use(feed({
-      collection: 'posts',
-      postDescription(file) {
-        return `<h1>${file.title}</h1>${file.contents}`;
-      }
-    })
-    );
+      .metadata({site: this.site})
+      .use(collections({posts: '*.html'}))
+      .use(
+        feed({
+          collection: 'posts',
+          postDescription(file) {
+            return `<h1>${file.title}</h1>${file.contents}`;
+          }
+        })
+      );
 
     return this.buildJson(rss => {
       assert.equal(rss['$']['xmlns:atom'], 'http://www.w3.org/2005/Atom');
@@ -106,38 +110,49 @@ describe('metalsmith-feed', function() {
 
       const post = channel.item[0];
       assert.equal(post.title[0], 'Theory of Juice');
-      assert.equal(post.description[0], '<h1>Theory of Juice</h1><p>juice appeal</p>\n');
+      assert.equal(
+        post.description[0],
+        '<h1>Theory of Juice</h1><p>juice appeal</p>\n'
+      );
       return done();
     });
   });
 
   it('adds custom elements to an item based on a function', function(done) {
     this.metalsmith = Metalsmith('test/fixtures/complex')
-    .metadata({site: this.site})
-    .use(collections({posts: '*.html'}))
-    .use(feed({
-      collection: 'posts',
-      postCustomElements(file) {
-        if (file.featuredImage) {
-          return [{
-            'media:image': [{
-              _attr: {
-                url: `http://example.com${file.featuredImage}`,
-                medium: 'image'
-              }
+      .metadata({site: this.site})
+      .use(collections({posts: '*.html'}))
+      .use(
+        feed({
+          collection: 'posts',
+          postCustomElements(file) {
+            if (file.featuredImage) {
+              return [
+                {
+                  'media:image': [
+                    {
+                      _attr: {
+                        url: `http://example.com${file.featuredImage}`,
+                        medium: 'image'
+                      }
+                    }
+                  ]
+                }
+              ];
             }
-            ]
           }
-          ];
-        }
-      }}));
+        })
+      );
 
     return this.buildJson(function(rss) {
       assert.equal(rss['$']['xmlns:atom'], 'http://www.w3.org/2005/Atom');
 
       const channel = rss['channel'][0];
       let post = channel.item[0];
-      assert.equal(post['media:image'][0]['$']['url'], 'http://example.com/foo.jpg');
+      assert.equal(
+        post['media:image'][0]['$']['url'],
+        'http://example.com/foo.jpg'
+      );
       assert.equal(post['media:image'][0]['$']['medium'], 'image');
 
       post = channel.item[1];
@@ -148,37 +163,36 @@ describe('metalsmith-feed', function() {
 
   it('complains if metalsmith-colllections isnt setup', function(done) {
     return this.metalsmith
-    .use(feed({collection: 'posts'}))
-    .build(function(err, files) {
-      assert.throws(() => assert.ifError(err)
-      , /collections/);
-      return done();
-    });
+      .use(feed({collection: 'posts'}))
+      .build(function(err) {
+        assert.throws(() => assert.ifError(err), /collections/);
+        return done();
+      });
   });
 
   it('complains without a site_url', function(done) {
     return this.metalsmith
-    .use(collections({posts: '*.html'}))
-    .use(feed({collection: 'posts'}))
-    .build(function(err, files) {
-      assert.throws(() => assert.ifError(err)
-      , /site_url/);
-      return done();
-    });
+      .use(collections({posts: '*.html'}))
+      .use(feed({collection: 'posts'}))
+      .build(function(err) {
+        assert.throws(() => assert.ifError(err), /site_url/);
+        return done();
+      });
   });
 
   it('preprocessor returns uppercase of title', function(done) {
     this.metalsmith
-    .metadata({site: this.site})
-    .use(collections({posts: '*.html'}))
-    .use(feed({
-      collection: 'posts',
-      preprocess(itemData) {
-        itemData.title = itemData.title.toUpperCase();
-        return itemData;
-      }
-    })
-    );
+      .metadata({site: this.site})
+      .use(collections({posts: '*.html'}))
+      .use(
+        feed({
+          collection: 'posts',
+          preprocess(itemData) {
+            itemData.title = itemData.title.toUpperCase();
+            return itemData;
+          }
+        })
+      );
 
     return this.buildJson(rss => {
       const post = rss['channel'][0].item[0];
@@ -189,16 +203,17 @@ describe('metalsmith-feed', function() {
 
   describe('limit option', function() {
     beforeEach(function() {
-      return this.metalsmith = Metalsmith('test/fixtures/many_posts')
-      .metadata({site: this.site})
-      .use(collections({posts: '*.html'}));
+      return (this.metalsmith = Metalsmith('test/fixtures/many_posts')
+        .metadata({site: this.site})
+        .use(collections({posts: '*.html'})));
     });
 
     it('limits the number of documents included in the feed', function(done) {
-      this.metalsmith.use(feed({
-        collection: 'posts',
-        limit: 10
-      })
+      this.metalsmith.use(
+        feed({
+          collection: 'posts',
+          limit: 10
+        })
       );
 
       return this.buildJson(rss => {
@@ -208,10 +223,11 @@ describe('metalsmith-feed', function() {
     });
 
     return it('is unlimited when set to false', function(done) {
-      this.metalsmith.use(feed({
-        collection: 'posts',
-        limit: false
-      })
+      this.metalsmith.use(
+        feed({
+          collection: 'posts',
+          limit: false
+        })
       );
 
       return this.buildJson(rss => {
@@ -223,14 +239,16 @@ describe('metalsmith-feed', function() {
 
   return describe('item with external url', function() {
     beforeEach(function() {
-      return this.metalsmith = Metalsmith('test/fixtures/external_link')
-      .metadata({site: this.site})
-      .use(collections({posts: '*.html'}));
+      return (this.metalsmith = Metalsmith('test/fixtures/external_link')
+        .metadata({site: this.site})
+        .use(collections({posts: '*.html'})));
     });
 
     it('url should be link set in the post', function(done) {
-      this.metalsmith.use(feed({
-        collection: 'posts'})
+      this.metalsmith.use(
+        feed({
+          collection: 'posts'
+        })
       );
 
       return this.buildJson(rss => {
@@ -245,8 +263,10 @@ describe('metalsmith-feed', function() {
     });
 
     return it('url should permalink', function(done) {
-      this.metalsmith.use(feed({
-        collection: 'posts'})
+      this.metalsmith.use(
+        feed({
+          collection: 'posts'
+        })
       );
 
       return this.buildJson(rss => {
