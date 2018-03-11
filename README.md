@@ -1,10 +1,10 @@
 # metalsmith-feed
 
-[![npm](https://img.shields.io/npm/v/npm.svg?style=flat-square)](https://www.npmjs.com/package/metalsmith-feed)
-[![Build Status](https://img.shields.io/travis/hurrymaplelad/metalsmith-feed.svg?style=flat-square)](https://travis-ci.org/hurrymaplelad/metalsmith-feed)
-[![Code Style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+[![npm](https://img.shields.io/npm/v/metalsmith-feed.svg?style=flat-square)](https://www.npmjs.com/package/metalsmith-feed) [![Build Status](https://img.shields.io/travis/hurrymaplelad/metalsmith-feed.svg?style=flat-square)](https://travis-ci.org/hurrymaplelad/metalsmith-feed) [![Code Style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
 A [metalsmith](https://github.com/segmentio/metalsmith) plugin to generate an RSS feed for a collection.
+
+Just a thin wrapper around the [rss](https://github.com/dylang/node-rss) module.
 
 Requires [metalsmith-collections](https://github.com/segmentio/metalsmith-collections). Plays nicely with [permalinks](https://github.com/segmentio/metalsmith-permalinks), [more](https://github.com/kfranqueiro/metalsmith-more), and [excerpts](https://github.com/segmentio/metalsmith-excerpts).
 
