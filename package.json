@@ -3,13 +3,7 @@
   "version": "0.5.0",
   "description": "A metalsmith plugin to generate an RSS feed for a collection",
   "author": "Adam Hull <adam@hmlad.com>",
-  "keywords": [
-    "metalsmith",
-    "atom",
-    "rss",
-    "feed",
-    "plugin"
-  ],
+  "keywords": ["metalsmith", "atom", "rss", "feed", "plugin"],
   "main": "metalsmith_feed",
   "repository": {
     "type": "git",
@@ -33,10 +27,10 @@
     "xml2js": "^0.4.17"
   },
   "scripts": {
-    "test": "mocha",
+    "test": "yarn run lint && mocha",
     "fix": "yarn run eslint --fix & yarn run prettier --write & wait",
     "lint": "yarn run eslint & yarn run prettier -l & wait",
-    "prettier": "prettier **/*.{json,md}",
+    "prettier": "prettier README.md",
     "eslint": "eslint ."
   },
   "prettier": {
@@ -44,17 +38,17 @@
     "bracketSpacing": false
   },
   "eslintConfig": {
-    "extends": [
-      "eslint:recommended",
-      "plugin:prettier/recommended"
-    ],
+    "extends": ["eslint:recommended", "plugin:prettier/recommended"],
     "env": {
       "node": true,
       "es6": true,
       "mocha": true
     },
     "parserOptions": {
-      "ecmaVersion": 2017
+      "ecmaVersion": 2017,
+      "ecmaFeatures": {
+        "experimentalObjectRestSpread": true
+      }
     }
   }
 }

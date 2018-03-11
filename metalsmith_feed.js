@@ -9,11 +9,6 @@ module.exports = function(options) {
   const limit = options.limit != null ? options.limit : 20;
   const destination = options.destination || 'rss.xml';
   const collectionName = options.collection;
-  const postDescription =
-    options.postDescription ||
-    (file => file.less || file.excerpt || file.contents);
-  const {postCustomElements} = options;
-
   if (!collectionName) {
     throw new Error('collection option is required');
   }
@@ -49,22 +44,20 @@ module.exports = function(options) {
     if (limit) {
       collection = collection.slice(0, limit);
     }
+    const preprocess = options.preprocess || (file => file);
     for (let file of collection) {
-      let itemData = extend({}, file, {description: postDescription(file)});
-      if (postCustomElements) {
-        itemData.custom_elements = postCustomElements(file);
-      }
+      const itemData = {
+        ...file,
+        description: file.less || file.excerpt || file.contents
+      };
       if (!itemData.url && itemData.path) {
-        itemData.url = url.resolve(siteUrl, file.path);
+        itemData.url = url.resolve(siteUrl, itemData.path);
       }
       if (itemData.link) {
         itemData.guid = itemData.url;
         itemData.url = itemData.link;
       }
-      if (options.preprocess) {
-        itemData = options.preprocess(itemData);
-      }
-      feed.item(itemData);
+      feed.item(preprocess(itemData));
     }
 
     files[destination] = {contents: new Buffer(feed.xml(), 'utf8')};

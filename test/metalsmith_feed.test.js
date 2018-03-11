@@ -6,28 +6,45 @@ const collections = require('metalsmith-collections');
 const {promisify} = require('util');
 
 const parseString = promisify(xml2js.parseString);
+
+const parse = async function(files, filename = 'rss.xml') {
+  const result = await parseString(files[filename].contents);
+  return result.rss;
+};
+
 Metalsmith.prototype.buildAsPromised = promisify(Metalsmith.prototype.build);
+const build = async function(metalsmith) {
+  return await metalsmith.buildAsPromised();
+};
+
+const metalsmithWithComplexFixtures = function() {
+  return Metalsmith('test/fixtures/complex')
+    .metadata({site})
+    .use(collections({posts: '*.html'}));
+};
+
+const parseComplexFixtures = async function(files) {
+  const rss = await parse(files);
+  const channel = rss.channel[0];
+
+  return {
+    postWithoutMeta: channel.item[0],
+    postWithMeta: channel.item[1]
+  };
+};
+
+const site = {
+  title: 'Geocities',
+  url: 'http://example.com',
+  author: 'Philodemus'
+};
 
 describe('metalsmith-feed', function() {
-  beforeEach(async function() {
-    this.metalsmith = Metalsmith('test/fixtures');
-
-    this.buildJson = async function() {
-      const files = await this.metalsmith.buildAsPromised();
-      const result = await parseString(files['rss.xml'].contents);
-      return result.rss;
-    };
-
-    this.site = {
-      title: 'Geocities',
-      url: 'http://example.com',
-      author: 'Philodemus'
-    };
-  });
+  beforeEach(async function() {});
 
   it('renders an RSS feed', async function() {
-    this.metalsmith
-      .metadata({site: this.site})
+    const metalsmith = Metalsmith('test/fixtures/simple')
+      .metadata({site})
       .use(collections({posts: '*.html'}))
       .use(
         feed({
@@ -35,12 +52,11 @@ describe('metalsmith-feed', function() {
         })
       );
 
-    const rss = await this.buildJson();
+    const rss = await parse(await build(metalsmith));
     assert.equal(rss['$']['xmlns:atom'], 'http://www.w3.org/2005/Atom');
-
-    const channel = rss['channel'][0];
-    assert.equal(channel.title[0], this.site.title);
-    assert.equal(channel.author[0], this.site.author);
+    const channel = rss.channel[0];
+    assert.equal(channel.title[0], site.title);
+    assert.equal(channel.author[0], site.author);
     assert.equal(channel.item.length, 1);
 
     const post = channel.item[0];
@@ -50,7 +66,7 @@ describe('metalsmith-feed', function() {
 
   it('renders multiple feeds', async function() {
     const metalsmith = Metalsmith('test/fixtures/many_posts')
-      .metadata({site: this.site})
+      .metadata({site})
       .use(
         collections({
           posts1: 'post1*.html',
@@ -70,133 +86,122 @@ describe('metalsmith-feed', function() {
         })
       );
 
-    const files = await metalsmith.buildAsPromised();
-    const {rss: rss1} = await parseString(files['rss1.xml'].contents);
+    const files = await build(metalsmith);
+
+    const rss1 = await parse(files, 'rss1.xml');
     assert(rss1['channel'][0].item.length > 0);
 
-    const {rss: rss2} = await parseString(files['rss2.xml'].contents);
+    const rss2 = await parse(files, 'rss2.xml');
     assert(rss2['channel'][0].item.length > 0);
   });
 
-  it('uses a custom renderer', async function() {
-    this.metalsmith
-      .metadata({site: this.site})
-      .use(collections({posts: '*.html'}))
-      .use(
-        feed({
-          collection: 'posts',
-          postDescription(file) {
-            return `<h1>${file.title}</h1>${file.contents}`;
-          }
-        })
+  describe('metalsmith integration', function() {
+    it('sets url to permalink', async function() {
+      const metalsmith = metalsmithWithComplexFixtures().use(
+        feed({collection: 'posts'})
       );
+      const {postWithoutMeta} = await parseComplexFixtures(
+        await build(metalsmith)
+      );
+      assert.equal(
+        postWithoutMeta.link[0],
+        'http://example.com/post_without_meta.html'
+      );
+      assert.equal(
+        postWithoutMeta.guid[0]._,
+        'http://example.com/post_without_meta.html'
+      );
+    });
 
-    const rss = await this.buildJson();
-    assert.equal(rss['$']['xmlns:atom'], 'http://www.w3.org/2005/Atom');
-
-    const channel = rss['channel'][0];
-    assert.equal(channel.title[0], this.site.title);
-    assert.equal(channel.author[0], this.site.author);
-    assert.equal(channel.item.length, 1);
-
-    const post = channel.item[0];
-    assert.equal(post.title[0], 'Theory of Juice');
-    assert.equal(
-      post.description[0],
-      '<h1>Theory of Juice</h1><p>juice appeal</p>\n'
-    );
+    it('sets url to external link from file meta', async function() {
+      const metalsmith = metalsmithWithComplexFixtures().use(
+        feed({collection: 'posts'})
+      );
+      const {postWithMeta} = await parseComplexFixtures(
+        await build(metalsmith)
+      );
+      assert.equal(postWithMeta.link[0], 'https://theory.com/juice/');
+      assert.equal(
+        postWithMeta.guid[0]._,
+        'http://example.com/post_with_meta.html'
+      );
+    });
   });
 
-  it('adds custom elements to an item based on a function', async function() {
-    this.metalsmith = Metalsmith('test/fixtures/complex')
-      .metadata({site: this.site})
-      .use(collections({posts: '*.html'}))
-      .use(
-        feed({
-          collection: 'posts',
-          postCustomElements(file) {
-            if (file.featuredImage) {
-              return [
-                {
-                  'media:image': [
-                    {
-                      _attr: {
-                        url: `http://example.com${file.featuredImage}`,
-                        medium: 'image'
-                      }
-                    }
-                  ]
+  describe('preprocessor option', function() {
+    it('can customize description', async function() {
+      const metalsmith = Metalsmith('test/fixtures/simple')
+        .metadata({site})
+        .use(collections({posts: '*.html'}))
+        .use(
+          feed({
+            collection: 'posts',
+            preprocess: file => ({
+              ...file,
+              description: `<h1>${file.title}</h1>${file.contents}`
+            })
+          })
+        );
+
+      const rss = await parse(await build(metalsmith));
+      const post = rss.channel[0].item[0];
+      assert.equal(post.title[0], 'Theory of Juice');
+      assert.equal(
+        post.description[0],
+        '<h1>Theory of Juice</h1><p>juice appeal</p>\n'
+      );
+    });
+
+    it('can add custom_elements for podcasts', async function() {
+      const makeFeaturedImage = file => {
+        if (!file.featuredImage) {
+          return null;
+        }
+        return [
+          {
+            'media:image': [
+              {
+                _attr: {
+                  url: `http://example.com${file.featuredImage}`,
+                  medium: 'image'
                 }
-              ];
-            }
+              }
+            ]
           }
-        })
+        ];
+      };
+
+      const metalsmith = Metalsmith('test/fixtures/complex')
+        .metadata({site})
+        .use(collections({posts: '*.html'}))
+        .use(
+          feed({
+            collection: 'posts',
+            preprocess: file => ({
+              ...file,
+              custom_elements: makeFeaturedImage(file)
+            })
+          })
+        );
+
+      const {postWithMeta, postWithoutMeta} = await parseComplexFixtures(
+        await build(metalsmith)
       );
 
-    const rss = await this.buildJson();
-    assert.equal(rss['$']['xmlns:atom'], 'http://www.w3.org/2005/Atom');
-
-    const channel = rss['channel'][0];
-    let post = channel.item[0];
-    assert.equal(
-      post['media:image'][0]['$']['url'],
-      'http://example.com/foo.jpg'
-    );
-    assert.equal(post['media:image'][0]['$']['medium'], 'image');
-
-    post = channel.item[1];
-    assert.equal(post['media:image'], undefined);
-  });
-
-  it('complains if metalsmith-colllections isnt setup', async function() {
-    const metalsmith = this.metalsmith.use(feed({collection: 'posts'}));
-
-    let err = null;
-    try {
-      await metalsmith.buildAsPromised();
-    } catch (e) {
-      err = e;
-    }
-    assert(err);
-  });
-
-  it('complains without a site_url', async function() {
-    const metalsmith = this.metalsmith
-      .use(collections({posts: '*.html'}))
-      .use(feed({collection: 'posts'}));
-
-    let err = null;
-    try {
-      await metalsmith.buildAsPromised();
-    } catch (e) {
-      err = e;
-    }
-    assert(err);
-  });
-
-  it('preprocessor returns uppercase of title', async function() {
-    this.metalsmith
-      .metadata({site: this.site})
-      .use(collections({posts: '*.html'}))
-      .use(
-        feed({
-          collection: 'posts',
-          preprocess(itemData) {
-            itemData.title = itemData.title.toUpperCase();
-            return itemData;
-          }
-        })
+      assert.equal(
+        postWithMeta['media:image'][0]['$']['url'],
+        'http://example.com/foo.jpg'
       );
+      assert.equal(postWithMeta['media:image'][0]['$']['medium'], 'image');
 
-    const rss = await this.buildJson();
-    const post = rss['channel'][0].item[0];
-    assert.equal(post.title[0], 'THEORY OF JUICE');
+      assert.equal(postWithoutMeta['media:image'], undefined);
+    });
   });
 
   describe('limit option', function() {
     beforeEach(function() {
       this.metalsmith = Metalsmith('test/fixtures/many_posts')
-        .metadata({site: this.site})
+        .metadata({site})
         .use(collections({posts: '*.html'}));
     });
 
@@ -208,8 +213,8 @@ describe('metalsmith-feed', function() {
         })
       );
 
-      const rss = await this.buildJson();
-      assert.equal(rss['channel'][0].item.length, 10);
+      const rss = await parse(await build(this.metalsmith));
+      assert.equal(rss.channel[0].item.length, 10);
     });
 
     it('is unlimited when set to false', async function() {
@@ -220,48 +225,42 @@ describe('metalsmith-feed', function() {
         })
       );
 
-      const rss = await this.buildJson();
-      assert.equal(rss['channel'][0].item.length, 25);
+      const rss = await parse(await build(this.metalsmith));
+      assert.equal(rss.channel[0].item.length, 25);
     });
   });
 
-  describe('item with external url', function() {
-    beforeEach(function() {
-      return (this.metalsmith = Metalsmith('test/fixtures/external_link')
-        .metadata({site: this.site})
-        .use(collections({posts: '*.html'})));
-    });
-
-    it('url should be link set in the post', async function() {
-      this.metalsmith.use(
+  it('complains if metalsmith-collections isnt setup', async function() {
+    const metalsmith = Metalsmith('test/fixtures/simple')
+      .metadata({site})
+      .use(
         feed({
           collection: 'posts'
         })
       );
 
-      const rss = await this.buildJson();
-      const channel = rss['channel'][0];
+    try {
+      await metalsmith.buildAsPromised();
+    } catch (e) {
+      var err = e;
+    }
+    assert(err);
+  });
 
-      const post = channel.item[1];
-      assert.equal(post.title[0], 'Theory of Juice - External');
-      assert.equal(post.link[0], 'https://theory.com/juice/');
-      assert.equal(post.guid[0]._, 'http://example.com/postwithlink.html');
-    });
-
-    it('url should permalink', async function() {
-      this.metalsmith.use(
+  it('complains without a site_url', async function() {
+    const metalsmith = Metalsmith('test/fixtures/simple')
+      .use(collections({posts: '*.html'}))
+      .use(
         feed({
           collection: 'posts'
         })
       );
 
-      const rss = await this.buildJson();
-      const channel = rss['channel'][0];
-
-      const post = channel.item[0];
-      assert.equal(post.title[0], 'Theory of Juice');
-      assert.equal(post.link[0], 'http://example.com/post.html');
-      assert.equal(post.guid[0]._, 'http://example.com/post.html');
-    });
+    try {
+      await metalsmith.buildAsPromised();
+    } catch (e) {
+      var err = e;
+    }
+    assert(err);
   });
 });
