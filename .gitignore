@@ -3,5 +3,6 @@ npm-debug.log
 .DS_Store
 test/fixtures/complex/build/
 test/fixtures/many_posts/build/
+test/fixtures/external_link/build/
 test/fixtures/build/
 yarn.lock
