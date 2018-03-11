@@ -41,6 +41,30 @@ describe 'metalsmith-feed', ->
       assert.equal post.description[0], '<p>juice appeal</p>\n'
       done()
 
+  it 'renders multiple feeds', (done) ->
+    @metalsmith = Metalsmith('test/fixtures/many_posts')
+      .metadata {@site}
+      .use collections
+        posts1: 'post1*.html'
+        posts2: 'post2*.html'
+      .use feed
+        collection: 'posts1'
+        destination: 'rss1.xml'
+      .use feed
+        collection: 'posts2'
+        destination: 'rss2.xml'
+
+    @metalsmith.build (err, files) ->
+      assert.ifError err
+      parseString files['rss1.xml'].contents, (err, {rss}) ->
+        assert.ifError err
+        assert rss['channel'][0].item.length > 0
+
+        parseString files['rss2.xml'].contents, (err, {rss}) ->
+          assert.ifError err
+          assert rss['channel'][0].item.length > 0
+          done()
+
   it 'uses a custom renderer', (done) ->
     @metalsmith
     .metadata {@site}
