@@ -19,7 +19,6 @@
   "bugs": "https://github.com/hurrymaplelad/metalsmith-feed/issues",
   "license": "MIT",
   "dependencies": {
-    "extend": "^3.0.0",
     "rss": "^1.2.2"
   },
   "devDependencies": {

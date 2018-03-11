@@ -3,3 +3,4 @@ npm-debug.log
 .DS_Store
 test/fixtures/*/build/
 yarn.lock
+yarn-error.log

@@ -3,12 +3,12 @@ module.exports = function(options) {
     options = {};
   }
   const RSS = require('rss');
-  const extend = require('extend');
   const url = require('url');
 
   const limit = options.limit != null ? options.limit : 20;
   const destination = options.destination || 'rss.xml';
   const collectionName = options.collection;
+
   if (!collectionName) {
     throw new Error('collection option is required');
   }
@@ -24,10 +24,12 @@ module.exports = function(options) {
 
     let collection = metadata.collections[collectionName];
 
-    const feedOptions = extend({}, metadata.site, options, {
+    const feedOptions = {
+      ...metadata.site,
+      ...options,
       site_url: metadata.site != null ? metadata.site.url : undefined,
       generator: 'metalsmith-feed'
-    });
+    };
 
     const siteUrl = feedOptions.site_url;
     if (!siteUrl) {
