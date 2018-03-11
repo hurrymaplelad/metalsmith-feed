@@ -10,7 +10,7 @@
     "feed",
     "plugin"
   ],
-  "main": "lib/metalsmith_feed",
+  "main": "metalsmith_feed",
   "repository": {
     "type": "git",
     "url": "git://github.com/hurrymaplelad/metalsmith-feed.git"
@@ -23,16 +23,12 @@
     "rss": "^1.2.2"
   },
   "devDependencies": {
-    "coffee-script": "^1.12.3",
     "metalsmith": "^2.3.0",
     "metalsmith-collections": "^0.9.0",
     "mocha": "^3.2.0",
     "xml2js": "^0.4.17"
   },
   "scripts": {
-    "pretest": "npm run compile",
-    "test": "mocha",
-    "compile": "coffee --bare --compile --output lib/ src/",
-    "prepublish": "npm run compile"
+    "test": "mocha"
   }
 }

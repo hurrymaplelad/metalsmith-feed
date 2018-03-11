@@ -8,18 +8,20 @@ Requires [metalsmith-collections](https://github.com/segmentio/metalsmith-collec
 
 ## Usage
 
-```coffee
-collections = require 'metalsmith-collections'
-feed = require 'metalsmith-feed'
+```js
+const collections = require("metalsmith-collections");
+const feed = require("metalsmith-feed");
 
-Metalsmith('example')
-  .metadata
-    site:
-      title: 'Geocities'
-      url: 'http://example.com'
-      author: 'Philodemus'
-  .use collections(posts: '*.html')
-  .use feed(collection: 'posts')
+Metalsmith("example")
+  .metadata(
+    (site: {
+      title: "Geocities",
+      url: "http://example.com",
+      author: "Philodemus"
+    })
+  )
+  .use(collections({ posts: "*.html" }))
+  .use(feed({ collection: "posts" }));
 ```
 
 ### Options
@@ -38,14 +40,17 @@ Take a look at the tests for [example usage](test/metalsmith_feed.test.coffee).
 
 * `preprocess` **function** _Optional_. Modify collection entries before creating the feed. Example:
 
-  ```coffee
-  Metalsmith('example')
-    .use feed
-      collection: 'posts'
-      preprocess: (itemData) ->
-        # Make all titles uppercase
-        itemData.title = itemData.title.toUpperCase()
-        itemData
+  ```js
+  Metalsmith("example").use(
+    feed({
+      collection: "posts",
+      preprocess: itemData => {
+        // Make all titles uppercase
+        itemData.title = itemData.title.toUpperCase();
+        return itemData;
+      }
+    })
+  );
   ```
 
 Remaining options are passed to the [rss](https://github.com/dylang/node-rss) module as `feedOptions`, along with `metadata.site`.
@@ -58,15 +63,24 @@ If files have `link` metadata set with any URL, it will be used to set `<link>` 
 
 Have a few collections you'd like to export? Register this plugin once for each:
 
-```coffee
-Metalsmith('example')
-  .use collections
-    foo: 'foo/*.html'
-    bar: 'bar/*.html'
-  .use feed
-    collection: 'foo'
-    destination: 'foo-rss.xml'
-  .use feed
-    collection: 'bar'
-    destination: 'bar-rss.xml'
+```js
+Metalsmith("example")
+  .use(
+    collections({
+      foo: "foo/*.html",
+      bar: "bar/*.html"
+    })
+  )
+  .use(
+    feed({
+      collection: "foo",
+      destination: "foo-rss.xml"
+    })
+  )
+  .use(
+    feed({
+      collection: "bar",
+      destination: "bar-rss.xml"
+    })
+  );
 ```
