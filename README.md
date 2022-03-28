@@ -38,7 +38,7 @@ Take a look at the tests for [example usage](test/metalsmith_feed.test.js).
 
 * `preprocess` **function** _Optional_. Map collection entries to [RSS items](https://github.com/dylang/node-rss#itemoptions). Some fields (like `description` and `url`) have default mappings that support Metalsmith plugin conventions. Many other fields (like `title`, `author`, and `date`) work great without any customization. You can customize any of these fields in `preprocess`.
 
-  ```js
+```js
   Metalsmith('example').use(
     feed({
       collection: 'posts',
@@ -48,22 +48,21 @@ Take a look at the tests for [example usage](test/metalsmith_feed.test.js).
         title: file.title.toUpperCase()
 
         /*
-  description: ...
-  Description defaults to `file.less` from metalsmith-more,
-  `file.excerpt` from metalsmith-excerpt, and finally the
-  full `file.contents`
-  ```
+        description: ...
+        Description defaults to `file.less` from metalsmith-more,
+        `file.excerpt` from metalsmith-excerpt, and finally the
+        full `file.contents`
+        
+        url: ...
+        If files have `path` metadata (perhaps from metalsmith-permalinks)
+        but not `url` metadata, we'll prefix `path` with `site_url` to
+        generate links.
+        */
+      })
+    })
+  );
+```
 
-url: ...
-If files have `path` metadata (perhaps from metalsmith-permalinks)
-but not `url` metadata, we'll prefix `path` with `site_url` to
-generate links.
-\*/
-})
-})
-);
-
-````
 Remaining options are passed to the [rss](https://github.com/dylang/node-rss) module as `feedOptions`, along with `metadata.site`.
 
 ### Multiple Feeds
@@ -90,4 +89,4 @@ Metalsmith('example')
     destination: 'bar-rss.xml'
   })
 );
-````
+```
